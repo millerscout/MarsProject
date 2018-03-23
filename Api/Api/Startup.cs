@@ -9,6 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
+using System.IO;
+using Core;
+using System.Web;
 
 namespace Api
 {
@@ -26,6 +29,10 @@ namespace Api
 		{
 			services.AddMvc();
 
+
+			var conn = Environment.GetEnvironmentVariable("dbConn");
+			var pass = HttpUtility.UrlEncode(Environment.GetEnvironmentVariable("dbPass"));
+			services.AddTransient<IMarsRepository>(c => new MarsRepository(string.Format(conn, pass)));
 			services.AddSwaggerGen(c =>
 			{
 				c.SwaggerDoc("v1", new Info { Title = "Mars Exploration", Version = "v1" });
@@ -39,6 +46,11 @@ namespace Api
 			{
 				app.UseDeveloperExceptionPage();
 			}
+			DefaultFilesOptions options = new DefaultFilesOptions();
+			options.DefaultFileNames.Clear();
+			options.DefaultFileNames.Add("index.html");
+			app.UseDefaultFiles(options);
+			app.UseStaticFiles();
 
 			app.UseMvc();
 
@@ -48,6 +60,8 @@ namespace Api
 			{
 				c.SwaggerEndpoint("/swagger/v1/swagger.json", "Mars Exploration v.1.0a");
 			});
+
+
 		}
 	}
 }

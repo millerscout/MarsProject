@@ -56,7 +56,7 @@ namespace ApiTestProj
 
 			var probe = new Probe { CurrentPosition = new Position { Direction = Direction.North, X = 1, Y = 2 } };
 			var probeTwo = new Probe { CurrentPosition = new Position { Direction = Direction.East, X = 3, Y = 3 } };
-			var CurrentProbes = new List<Probe>() { probe , probeTwo};
+			var CurrentProbes = new List<Probe>() { probe, probeTwo };
 			CCmock.Setup(q => q.GetCurrentProbes()).Returns(() => CurrentProbes).Callback(() =>
 			{
 
