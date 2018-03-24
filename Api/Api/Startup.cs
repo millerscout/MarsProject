@@ -27,6 +27,18 @@ namespace Api
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.AddCors(options =>
+			{
+				options.AddPolicy("ExternalPolicy",
+					builder =>
+					builder.AllowAnyOrigin()
+					.AllowAnyMethod()
+					.WithExposedHeaders("content-disposition")
+					.AllowAnyHeader()
+					.AllowCredentials()
+					.SetPreflightMaxAge(TimeSpan.FromSeconds(3600)));
+			});
+
 			services.AddMvc();
 
 
@@ -46,6 +58,7 @@ namespace Api
 			{
 				app.UseDeveloperExceptionPage();
 			}
+
 			DefaultFilesOptions options = new DefaultFilesOptions();
 			options.DefaultFileNames.Clear();
 			options.DefaultFileNames.Add("index.html");

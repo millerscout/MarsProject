@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+import { MarsService } from './../services/MarsService'
 
 interface Grid {
   [x: string]: Array<number>;
@@ -7,18 +10,19 @@ interface Grid {
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+  styleUrls: ['./map.component.css'],
 })
 export class MapComponent implements OnInit {
-  gridX: number = 8;
-  gridY: number = 8;
+  world: MarsService.World[]
   gridObject: Grid = {};
   grid: Array<string>;
   explored = { 1: [2, 3, 5] };
   probes = { "1": { "5": { direction: 90 } } };
-
-  constructor() {
-    this.mountGrid();
+  service: MarsService.Client;
+  constructor(private http: HttpClient) {
+    let base = "http://localhost:54988";
+    this.service = new MarsService.Client(http, base);
+    this.fetchData();
   }
 
   ngOnInit() {
@@ -46,15 +50,26 @@ export class MapComponent implements OnInit {
     // -o-transform: rotate(${number}deg);
     // -ms-transform: rotate(${number}deg);`
   }
-  mountGrid(): void {
-    for (let x = 0; x < this.gridX + 1; x++) {
-      this.gridObject[x] = [];
+  fetchData() {
+    let list = this.service.apiMarsGet();
 
-      for (let y = 0; y < this.gridY + 1; y++) {
-        this.gridObject[x].push(y);
-      }
-    }
-    this.grid = Object.keys(this.gridObject).reverse();
+    list.subscribe(data => {
+      this.world = data
+      this.mountGrid();
+    });
   }
+  mountGrid(): void {
 
+    if (this.world.length > 0) {
+      var current = this.world[0]
+      for (let x = 0; x < parseInt(current.grid.x) + 1; x++) {
+        this.gridObject[x] = [];
+
+        for (let y = 0; y < parseInt(current.grid.y) + 1; y++) {
+          this.gridObject[x].push(y);
+        }
+      }
+      this.grid = Object.keys(this.gridObject).reverse();
+    }
+  }
 }

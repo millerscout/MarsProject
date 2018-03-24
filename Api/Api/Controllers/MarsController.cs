@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Core;
 using Core.Models;
+using Microsoft.AspNetCore.Cors;
 
 namespace Api.Controllers
 {
 	[Route("api/[controller]")]
+	[EnableCors("ExternalPolicy")]
 	public class MarsController : Controller
 	{
 		private readonly IMarsRepository rep;
