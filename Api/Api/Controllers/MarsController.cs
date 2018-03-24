@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Core;
+using Core.Models;
 
 namespace Api.Controllers
 {
@@ -17,35 +18,38 @@ namespace Api.Controllers
 		}
 		// GET api/values
 		[HttpGet]
-		public IEnumerable<string> Get()
+		public IEnumerable<World> Get()
 		{
-			rep.dosome();
-			return new string[] { "value1", "value2" };
+			return rep.GetAll();
 		}
 
 		// GET api/values/5
 		[HttpGet("{id}")]
-		public string Get(int id)
+		public World Get(Guid id)
 		{
-			return "value";
+			return rep.FirstOrDefault(c => c.PublicId == id);
 		}
 
 		// POST api/values
 		[HttpPost]
-		public void Post([FromBody]string value)
+		public void Post([FromBody]World world)
 		{
+			rep.Add(world);
 		}
 
 		// PUT api/values/5
-		[HttpPut("{id}")]
-		public void Put(int id, [FromBody]string value)
+		[HttpPut]
+		public void Put([FromBody]World world)
 		{
+			rep.Update(world);
 		}
 
 		// DELETE api/values/5
 		[HttpDelete("{id}")]
-		public void Delete(int id)
+		public void Delete(Guid id)
 		{
+			var world = rep.FirstOrDefault(q => q.PublicId == id);
+			rep.Delete(world);
 		}
 	}
 }

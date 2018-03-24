@@ -1,3 +1,5 @@
+using Core.Enums;
+using Core.Models;
 using Moq;
 using SimpleInjector;
 using System;
@@ -13,10 +15,10 @@ namespace ApiTestProj
 		{
 
 
-			container.Register<ITerrain>(() => terrainMock.Object);
+			container.Register<IWorld>(() => terrainMock.Object);
 			container.Register<ICommandCenter>(() => CCmock.Object);
 		}
-		private Mock<MarsTerrain> terrainMock = new Mock<MarsTerrain>();
+		private Mock<World> terrainMock = new Mock<World>();
 		private Mock<CommandCenter> CCmock = new Mock<CommandCenter>();
 		private Container container = new Container();
 
@@ -27,7 +29,7 @@ namespace ApiTestProj
 
 			byte x = 5;
 			byte y = 5;
-			var Terrain = container.GetInstance<ITerrain>();
+			var Terrain = container.GetInstance<IWorld>();
 
 			var result = Terrain.GenerateGrid(x, y);
 
@@ -39,7 +41,7 @@ namespace ApiTestProj
 		public void AddSingleProbe()
 		{
 
-			var terrain = container.GetInstance<ITerrain>();
+			var terrain = container.GetInstance<IWorld>();
 
 			var result = terrain.AddProbe(new Position { Direction = Direction.South, X = 2, Y = 3 });
 
@@ -57,13 +59,7 @@ namespace ApiTestProj
 			var probe = new Probe { CurrentPosition = new Position { Direction = Direction.North, X = 1, Y = 2 } };
 			var probeTwo = new Probe { CurrentPosition = new Position { Direction = Direction.East, X = 3, Y = 3 } };
 			var CurrentProbes = new List<Probe>() { probe, probeTwo };
-			CCmock.Setup(q => q.GetCurrentProbes()).Returns(() => CurrentProbes).Callback(() =>
-			{
-
-				//CurrentProbes.
-			});
-
-
+			CCmock.Setup(q => q.GetCurrentProbes()).Returns(() => CurrentProbes);
 
 			probe.AddCommands("LMLMLMLMM");
 			probeTwo.AddCommands("MMRMMRMRRM");
@@ -84,141 +80,5 @@ namespace ApiTestProj
 
 		}
 
-
-		public interface ICommandCenter
-		{
-			bool MoveProbes(int turns = 1);
-		}
-
-		public interface ITerrain
-		{
-			Grid GenerateGrid(byte X, byte Y);
-			Probe AddProbe(Position position);
-		}
-		public class MarsTerrain : ITerrain
-		{
-			public Probe AddProbe(Position position)
-			{
-				return new Probe() { CurrentPosition = position };
-			}
-
-			public Grid GenerateGrid(byte X, byte Y)
-			{
-				return new Grid { X = X, Y = Y };
-			}
-		}
-		public class CommandCenter : ICommandCenter
-		{
-
-			public virtual List<Probe> GetCurrentProbes()
-			{
-				throw new NotImplementedException();
-			}
-			public bool MoveProbes(int turns = 1)
-			{
-				var probes = GetCurrentProbes();
-
-				var current = probes.FirstOrDefault(q => q.HasInstructions);
-
-				var command = current.GetNextCommand();
-
-				current.Move(command);
-
-				return probes.Any(q => q.HasInstructions);
-			}
-		}
 	}
-
-	public enum Direction
-	{
-		North,
-		East,
-		South,
-		West
-	}
-	public class Probe
-	{
-		public bool HasInstructions { get { return Commands.Count > 0; } }
-		public List<Command> Commands { get; set; }
-		public Position CurrentPosition { get; set; }
-
-		public Command GetNextCommand()
-		{
-			var command = Commands.FirstOrDefault();
-			Commands.RemoveRange(0, 1);
-			return command;
-		}
-
-		public void Move(Command command)
-		{
-			switch (command)
-			{
-				case Command.TurnLeft:
-					if (CurrentPosition.Direction == Direction.North)
-					{
-						CurrentPosition.Direction = Direction.West;
-					}
-					else
-					{
-						CurrentPosition.Direction = CurrentPosition.Direction - 1;
-					}
-					break;
-				case Command.Forward:
-					if (CurrentPosition.Direction == Direction.North)
-					{
-						CurrentPosition.Y += 1;
-					}
-					if (CurrentPosition.Direction == Direction.South)
-					{
-						CurrentPosition.Y -= 1;
-
-					}
-					if (CurrentPosition.Direction == Direction.East)
-					{
-						CurrentPosition.X += 1;
-					}
-					if (CurrentPosition.Direction == Direction.West)
-					{
-						CurrentPosition.X -= 1;
-					}
-					break;
-				case Command.TurnRight:
-					if (CurrentPosition.Direction == Direction.West)
-					{
-						CurrentPosition.Direction = Direction.North;
-					}
-					else
-					{
-						CurrentPosition.Direction = CurrentPosition.Direction + 1;
-					}
-					break;
-				default:
-					break;
-			}
-		}
-
-		public void AddCommands(string commands)
-		{
-			Commands = commands.ToCharArray().Select(q => q == 'L' ? Command.TurnLeft : q == 'R' ? Command.TurnRight : Command.Forward).ToList();
-		}
-	}
-	public enum Command
-	{
-		TurnLeft,
-		Forward,
-		TurnRight
-	}
-	public class Position
-	{
-		public byte X { get; set; }
-		public byte Y { get; set; }
-		public Direction Direction { get; set; }
-
-	}
-	public class Grid
-	{
-		public byte X { get; set; }
-		public byte Y { get; set; }
-	}
-
 }
