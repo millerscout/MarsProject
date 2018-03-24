@@ -1,4 +1,6 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,6 +14,9 @@ namespace Core.Models
 	}
 	public class World : IWorld
 	{
+		[JsonIgnore]
+		public ObjectId Id { get; set; }
+
 		public Grid Grid { get; set; }
 		[BsonElement("publicId")]
 		public Guid PublicId { get; set; }

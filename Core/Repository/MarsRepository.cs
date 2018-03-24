@@ -22,11 +22,14 @@ namespace Core
 
 		public void Add(World entity)
 		{
+			entity.PublicId = Guid.NewGuid();
 			collection.InsertOne(entity);
 		}
 
 		public void Add(ICollection<World> entities)
 		{
+			entities.ToList().ForEach((e) => { e.PublicId = Guid.NewGuid(); });
+
 			collection.InsertMany(entities);
 		}
 
@@ -47,7 +50,7 @@ namespace Core
 
 		public IEnumerable<World> GetAll()
 		{
-			return collection.Find(q => true).ToEnumerable();
+			return collection.Find(q => true).ToList();
 		}
 
 

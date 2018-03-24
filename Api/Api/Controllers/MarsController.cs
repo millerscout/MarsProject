@@ -16,39 +16,36 @@ namespace Api.Controllers
 		{
 			this.rep = rep;
 		}
-		// GET api/values
 		[HttpGet]
 		public IEnumerable<World> Get()
 		{
 			return rep.GetAll();
 		}
 
-		// GET api/values/5
 		[HttpGet("{id}")]
-		public World Get(Guid id)
+		public World Get(string id)
 		{
-			return rep.FirstOrDefault(c => c.PublicId == id);
+			return rep.FirstOrDefault(c => c.PublicId == Guid.Parse(id));
 		}
 
-		// POST api/values
 		[HttpPost]
-		public void Post([FromBody]World world)
+		public void Post([FromBody]Grid grid)
 		{
+			var world = new World { Grid = grid };
+			world.PublicId = Guid.NewGuid();
 			rep.Add(world);
 		}
 
-		// PUT api/values/5
 		[HttpPut]
 		public void Put([FromBody]World world)
 		{
 			rep.Update(world);
 		}
 
-		// DELETE api/values/5
 		[HttpDelete("{id}")]
-		public void Delete(Guid id)
+		public void Delete(string id)
 		{
-			var world = rep.FirstOrDefault(q => q.PublicId == id);
+			var world = rep.FirstOrDefault(q => q.PublicId == Guid.Parse(id));
 			rep.Delete(world);
 		}
 	}
