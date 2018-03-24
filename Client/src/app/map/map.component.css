@@ -1,0 +1,52 @@
+/**Grids*/
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  width: 100%;
+  height: auto;
+  padding-top: 60%;
+  background: tomato;
+  z-index: -1;
+  top: 0px;
+}
+.screen{
+  width: 100%;
+  height: 100%;
+}
+.grid-x{
+  margin: 0 auto;
+  width: 50%;
+  display: -ms-flex;
+  display: -webkit-flex;
+  display: flex;
+}
+.grid-x>.grid-y{
+  flex:1;
+}
+.grid-y{
+  min-height:40px;
+  padding:5px;
+  border: 1px solid #ccc;
+  background: black;
+  text-align: center;
+}
+.grid-y p{
+  align-self: flex-end;
+}
+.grid-y.explored{
+  background: white;
+  color: black;
+}
+.grid-y.unexplored{
+  background: gray;
+  color: white;
+}
+/*probes*/
+.probe{
+  height:30px
+}
+
+/** others **/
+p{
+  margin:0
+}

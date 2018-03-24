@@ -1,0 +1,12 @@
+<div class="circle"></div>
+<div class="screen">
+  <div class="grid-x" *ngFor="let x of grid">
+    <div class="grid-y" *ngFor="let y of gridObject[x]" [ngClass]="getExplored(x,y)">
+
+      <img *ngIf="hasProbe(x,y)" class="probe" src="assets/img/probe.png" [ngStyle]="{'transform': getRotation(x,y)}">
+      <p>
+        <small>pos:({{x}}, {{y}})</small>
+      </p>
+    </div>
+  </div>
+</div>
