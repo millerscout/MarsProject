@@ -31,11 +31,12 @@ namespace Api.Controllers
 		}
 
 		[HttpPost]
-		public void Post([FromBody]Grid grid)
+		public World Post([FromBody]Grid grid)
 		{
 			var world = new World { Grid = grid };
 			world.PublicId = Guid.NewGuid();
 			rep.Add(world);
+			return world;
 		}
 
 		[HttpPut]

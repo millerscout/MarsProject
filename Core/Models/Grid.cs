@@ -6,7 +6,7 @@ namespace Core.Models
 {
 	public class Grid
 	{
-		public byte X { get; set; }
-		public byte Y { get; set; }
+		public int X { get; set; }
+		public int Y { get; set; }
 	}
 }

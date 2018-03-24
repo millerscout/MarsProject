@@ -1,12 +1,99 @@
 <div class="circle"></div>
 <div class="screen">
-  <div class="grid-x" *ngFor="let x of grid">
-    <div class="grid-y" *ngFor="let y of gridObject[x]" [ngClass]="getExplored(x,y)">
+  <div *ngIf="world" class="actions">
+    <p>Map Id: {{world.publicId}}</p>
 
-      <img *ngIf="hasProbe(x,y)" class="probe" src="assets/img/probe.png" [ngStyle]="{'transform': getRotation(x,y)}">
-      <p>
-        <small>pos:({{x}}, {{y}})</small>
+    <p>
+      <b>AddProbe</b>
+    </p>
+    <label> x
+      <input #x type="number" placeholder="5" />
+    </label>
+    <label> y
+      <input #y type="number" placeholder="5" />
+    </label>
+    <label> direction
+      <select #direction>
+        <option value="0">
+          North
+        </option>
+        <option value="1">
+          East
+        </option>
+        <option value="2">
+          South
+        </option>
+        <option value="3">
+          West
+        </option>
+      </select>
+    </label>
+    <button (click)="addProbe(x.value,y.value,direction.value)">add</button>
+    <hr/>
+    <p>
+      <b>Add Command</b>
+    </p>
+    <label> select the probe by coordination</label>
+    <select #selected>
+      <option *ngFor="let probe of world.commandCenter.probes" [value]="probe.publicId">({{probe.currentPosition.x}},{{probe.currentPosition.y}})</option>
+    </select>
+    <button (click)="addCommand(selected.value,0)">Turn Left</button>
+    <button (click)="addCommand(selected.value,2)">Turn Right</button>
+    <button (click)="addCommand(selected.value,1)">Forward</button>
+
+    Commands:{{selected.value.commands}}
+  </div>
+  <div class="form" *ngIf="step==0">
+    <div>
+      <p>Etan Dusk has sent money to our company.</p>
+      <hr>
+      <p>you're responsible to organize the mission to explore mars.</p>
+
+      <p class="margin-bottom-10">
+        <label>
+          you first job as leader is inform what's the size of the grid to be explored or tell the uniqueId of previous missions.
+        </label>
       </p>
+      <div>
+        <label>New Mission
+          <input type="radio" checked name="missionType" (click)="setMission(true)">
+        </label>
+
+        <label>Previous Mission
+          <input type="radio" name="missionType" (click)="setMission(false)">
+        </label>
+      </div>
+      <div *ngIf="missionType=='newMission'">
+        <p class="margin-bottom-10">
+          <label>X
+            <input #x type="number" placeholder="5" />
+          </label>
+        </p>
+        <p class="margin-bottom-10">
+          <label>Y
+            <input #y type="number" placeholder="5" />
+          </label>
+        </p>
+        <button (click)="confirmGrid(x.value, y.value)">Confirm</button>
+      </div>
+      <div *ngIf="missionType=='previousMission'">
+        <p>
+          <label>UniqueId:</label>
+        </p>
+        <input style='width:500px' #id type="text" placeholder="something  like '4cb670bc-6ce9-429a-b5c2-ddbc44ea028f'" />
+        <button (click)="loadGrid(id.value)">Confirm</button>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="grid-x" *ngFor="let x of grid">
+      <div class="grid-y" *ngFor="let y of gridObject[x]" [ngClass]="getExplored(x,y)">
+
+        <img *ngIf="hasProbe(x,y)" class="probe" src="assets/img/probe.png" [ngStyle]="{'transform': getRotation(x,y)}">
+        <p>
+          <small>pos:({{x}}, {{y}})</small>
+        </p>
+      </div>
     </div>
   </div>
 </div>

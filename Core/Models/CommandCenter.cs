@@ -12,9 +12,10 @@ namespace Core.Models
 
 	public class CommandCenter : ICommandCenter
 	{
+		public List<Probe> Probes { get; set; }
 		public virtual List<Probe> GetCurrentProbes()
 		{
-			throw new NotImplementedException();
+			return Probes;
 		}
 		public bool MoveProbes(int turns = 1)
 		{

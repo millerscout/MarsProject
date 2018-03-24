@@ -58,7 +58,8 @@ namespace Core
 		{
 			var filter = Builders<World>.Filter.Eq(q => q.PublicId, entity.PublicId);
 			var update = Builders<World>.Update
-										  .Set(x => x.Grid, entity.Grid);
+										  .Set(x => x.Grid, entity.Grid)
+										  .Set(x => x.CommandCenter, entity.CommandCenter);
 
 			collection.UpdateOne(filter, update);
 		}

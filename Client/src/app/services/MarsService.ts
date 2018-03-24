@@ -23,6 +23,21 @@ export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface IClient {
     /**
+     * @cc (optional)
+     * @return Success
+     */
+    apiCommandCenterSaveCommandsByWorldIdPut(worldId: string, cc: CommandCenter | null | undefined): Observable<void>;
+    /**
+     * @pos (optional)
+     * @return Success
+     */
+    apiCommandCenterAddProbeByWorldIdPost(worldId: string, pos: Position | null | undefined): Observable<CommandCenter>;
+    /**
+     * @cc (optional)
+     * @return Success
+     */
+    apiCommandCenterMoveProbesPost(cc: CommandCenter | null | undefined): Observable<CommandCenter>;
+    /**
      * @return Success
      */
     apiMarsGet(): Observable<World[]>;
@@ -35,7 +50,7 @@ export interface IClient {
      * @grid (optional)
      * @return Success
      */
-    apiMarsPost(grid: Grid | null | undefined): Observable<void>;
+    apiMarsPost(grid: Grid | null | undefined): Observable<World>;
     /**
      * @return Success
      */
@@ -55,6 +70,176 @@ export class Client implements IClient {
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
         this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @cc (optional)
+     * @return Success
+     */
+    apiCommandCenterSaveCommandsByWorldIdPut(worldId: string, cc: CommandCenter | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/CommandCenter/saveCommands/{worldId}";
+        if (worldId === undefined || worldId === null)
+            throw new Error("The parameter 'worldId' must be defined.");
+        url_ = url_.replace("{worldId}", encodeURIComponent("" + worldId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(cc);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("put", url_, options_).flatMap((response_ : any) => {
+            return this.processApiCommandCenterSaveCommandsByWorldIdPut(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processApiCommandCenterSaveCommandsByWorldIdPut(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<void>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processApiCommandCenterSaveCommandsByWorldIdPut(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).flatMap(_responseText => {
+            return Observable.of<void>(<any>null);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<void>(<any>null);
+    }
+
+    /**
+     * @pos (optional)
+     * @return Success
+     */
+    apiCommandCenterAddProbeByWorldIdPost(worldId: string, pos: Position | null | undefined): Observable<CommandCenter> {
+        let url_ = this.baseUrl + "/api/CommandCenter/addProbe/{worldId}";
+        if (worldId === undefined || worldId === null)
+            throw new Error("The parameter 'worldId' must be defined.");
+        url_ = url_.replace("{worldId}", encodeURIComponent("" + worldId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(pos);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
+            return this.processApiCommandCenterAddProbeByWorldIdPost(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processApiCommandCenterAddProbeByWorldIdPost(<any>response_);
+                } catch (e) {
+                    return <Observable<CommandCenter>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<CommandCenter>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processApiCommandCenterAddProbeByWorldIdPost(response: HttpResponseBase): Observable<CommandCenter> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? CommandCenter.fromJS(resultData200) : new CommandCenter();
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<CommandCenter>(<any>null);
+    }
+
+    /**
+     * @cc (optional)
+     * @return Success
+     */
+    apiCommandCenterMoveProbesPost(cc: CommandCenter | null | undefined): Observable<CommandCenter> {
+        let url_ = this.baseUrl + "/api/CommandCenter/moveProbes";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(cc);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).flatMap((response_ : any) => {
+            return this.processApiCommandCenterMoveProbesPost(response_);
+        }).catch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processApiCommandCenterMoveProbesPost(<any>response_);
+                } catch (e) {
+                    return <Observable<CommandCenter>><any>Observable.throw(e);
+                }
+            } else
+                return <Observable<CommandCenter>><any>Observable.throw(response_);
+        });
+    }
+
+    protected processApiCommandCenterMoveProbesPost(response: HttpResponseBase): Observable<CommandCenter> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).flatMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? CommandCenter.fromJS(resultData200) : new CommandCenter();
+            return Observable.of(result200);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).flatMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Observable.of<CommandCenter>(<any>null);
     }
 
     /**
@@ -169,7 +354,7 @@ export class Client implements IClient {
      * @grid (optional)
      * @return Success
      */
-    apiMarsPost(grid: Grid | null | undefined): Observable<void> {
+    apiMarsPost(grid: Grid | null | undefined): Observable<World> {
         let url_ = this.baseUrl + "/api/Mars";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -181,6 +366,7 @@ export class Client implements IClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -191,14 +377,14 @@ export class Client implements IClient {
                 try {
                     return this.processApiMarsPost(<any>response_);
                 } catch (e) {
-                    return <Observable<void>><any>Observable.throw(e);
+                    return <Observable<World>><any>Observable.throw(e);
                 }
             } else
-                return <Observable<void>><any>Observable.throw(response_);
+                return <Observable<World>><any>Observable.throw(response_);
         });
     }
 
-    protected processApiMarsPost(response: HttpResponseBase): Observable<void> {
+    protected processApiMarsPost(response: HttpResponseBase): Observable<World> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -207,14 +393,17 @@ export class Client implements IClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
         if (status === 200) {
             return blobToText(responseBlob).flatMap(_responseText => {
-            return Observable.of<void>(<any>null);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? World.fromJS(resultData200) : new World();
+            return Observable.of(result200);
             });
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).flatMap(_responseText => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Observable.of<void>(<any>null);
+        return Observable.of<World>(<any>null);
     }
 
     /**
@@ -324,10 +513,154 @@ export class Client implements IClient {
     }
 }
 
+export class CommandCenter implements ICommandCenter {
+    probes?: Probe[] | undefined;
+
+    constructor(data?: ICommandCenter) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            if (data["probes"] && data["probes"].constructor === Array) {
+                this.probes = [];
+                for (let item of data["probes"])
+                    this.probes.push(Probe.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CommandCenter {
+        data = typeof data === 'object' ? data : {};
+        let result = new CommandCenter();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (this.probes && this.probes.constructor === Array) {
+            data["probes"] = [];
+            for (let item of this.probes)
+                data["probes"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface ICommandCenter {
+    probes?: Probe[] | undefined;
+}
+
+export class Probe implements IProbe {
+    publicId?: string | undefined;
+    order?: number | undefined;
+    commands?: Commands[] | undefined;
+    currentPosition?: Position | undefined;
+
+    constructor(data?: IProbe) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.publicId = data["publicId"];
+            this.order = data["order"];
+            if (data["commands"] && data["commands"].constructor === Array) {
+                this.commands = [];
+                for (let item of data["commands"])
+                    this.commands.push(item);
+            }
+            this.currentPosition = data["currentPosition"] ? Position.fromJS(data["currentPosition"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): Probe {
+        data = typeof data === 'object' ? data : {};
+        let result = new Probe();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["publicId"] = this.publicId;
+        data["order"] = this.order;
+        if (this.commands && this.commands.constructor === Array) {
+            data["commands"] = [];
+            for (let item of this.commands)
+                data["commands"].push(item);
+        }
+        data["currentPosition"] = this.currentPosition ? this.currentPosition.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IProbe {
+    publicId?: string | undefined;
+    order?: number | undefined;
+    commands?: Commands[] | undefined;
+    currentPosition?: Position | undefined;
+}
+
+export class Position implements IPosition {
+    x?: string | undefined;
+    y?: string | undefined;
+    direction?: PositionDirection | undefined;
+
+    constructor(data?: IPosition) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.x = data["x"];
+            this.y = data["y"];
+            this.direction = data["direction"];
+        }
+    }
+
+    static fromJS(data: any): Position {
+        data = typeof data === 'object' ? data : {};
+        let result = new Position();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["x"] = this.x;
+        data["y"] = this.y;
+        data["direction"] = this.direction;
+        return data;
+    }
+}
+
+export interface IPosition {
+    x?: string | undefined;
+    y?: string | undefined;
+    direction?: PositionDirection | undefined;
+}
+
 export class World implements IWorld {
     grid?: Grid | undefined;
     publicId?: string | undefined;
-    commandCenter?: any | undefined;
+    commandCenter?: CommandCenter | undefined;
 
     constructor(data?: IWorld) {
         if (data) {
@@ -342,13 +675,7 @@ export class World implements IWorld {
         if (data) {
             this.grid = data["grid"] ? Grid.fromJS(data["grid"]) : <any>undefined;
             this.publicId = data["publicId"];
-            if (data["commandCenter"]) {
-                this.commandCenter = {};
-                for (let key in data["commandCenter"]) {
-                    if (data["commandCenter"].hasOwnProperty(key))
-                        this.commandCenter[key] = data["commandCenter"][key];
-                }
-            }
+            this.commandCenter = data["commandCenter"] ? CommandCenter.fromJS(data["commandCenter"]) : <any>undefined;
         }
     }
 
@@ -363,13 +690,7 @@ export class World implements IWorld {
         data = typeof data === 'object' ? data : {};
         data["grid"] = this.grid ? this.grid.toJSON() : <any>undefined;
         data["publicId"] = this.publicId;
-        if (this.commandCenter) {
-            data["commandCenter"] = {};
-            for (let key in this.commandCenter) {
-                if (this.commandCenter.hasOwnProperty(key))
-                    data["commandCenter"][key] = this.commandCenter[key];
-            }
-        }
+        data["commandCenter"] = this.commandCenter ? this.commandCenter.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -377,12 +698,12 @@ export class World implements IWorld {
 export interface IWorld {
     grid?: Grid | undefined;
     publicId?: string | undefined;
-    commandCenter?: any | undefined;
+    commandCenter?: CommandCenter | undefined;
 }
 
 export class Grid implements IGrid {
-    x?: string | undefined;
-    y?: string | undefined;
+    x?: number | undefined;
+    y?: number | undefined;
 
     constructor(data?: IGrid) {
         if (data) {
@@ -416,8 +737,21 @@ export class Grid implements IGrid {
 }
 
 export interface IGrid {
-    x?: string | undefined;
-    y?: string | undefined;
+    x?: number | undefined;
+    y?: number | undefined;
+}
+
+export enum Commands {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+}
+
+export enum PositionDirection {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
 }
 
 export class SwaggerException extends Error {

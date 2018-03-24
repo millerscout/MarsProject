@@ -50,3 +50,18 @@
 p{
   margin:0
 }
+.margin-bottom-10{
+  margin-bottom: 10px!important;
+}
+/**form ***/
+.form,.actions{
+  width: 70%;
+  background: white;
+  margin:0 auto;
+  padding:15px;
+  border-radius: 5px;
+  margin-bottom:10px
+}
+.actions input[type="number"]{
+  width:30px;
+}

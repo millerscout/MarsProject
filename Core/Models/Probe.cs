@@ -1,4 +1,5 @@
 ﻿using Core.Enums;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,14 @@ namespace Core.Models
 {
 	public class Probe
 	{
-		public bool HasInstructions { get { return Commands.Count > 0; } }
+		public Probe()
+		{
+			Commands = new List<Command>();
+		}
+		public Guid PublicId { get; set; }
+		public int Order { get; set; }
+		[JsonIgnore]
+		public bool HasInstructions { get { return Commands == null ? false : Commands.Count > 0; } }
 		public List<Command> Commands { get; set; }
 		public Position CurrentPosition { get; set; }
 
