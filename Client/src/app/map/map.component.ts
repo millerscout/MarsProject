@@ -17,7 +17,7 @@ export class MapComponent implements OnInit {
   world: MarsService.World
   gridObject: Grid = {};
   grid: Array<string>;
-  explored = { 1: [2, 3, 5] };
+  explored = {};
   probes = {};
   service: MarsService.Client;
   missionType = "newMission";
@@ -25,7 +25,6 @@ export class MapComponent implements OnInit {
   constructor(private http: HttpClient) {
     let base = "http://localhost:54988";
     this.service = new MarsService.Client(http, base);
-    // this.fetchData();
   }
 
   ngOnInit() {
@@ -123,6 +122,10 @@ export class MapComponent implements OnInit {
       if (probe.currentPosition.direction == 3) direction = 0;
       this.probes[probe.currentPosition.x] = {}
       this.probes[probe.currentPosition.x][probe.currentPosition.y] = { direction: direction }
+
+      if (this.explored[probe.currentPosition.x] == null) this.explored[probe.currentPosition.x] = [probe.currentPosition.y]
+      else
+        this.explored[probe.currentPosition.x].push(probe.currentPosition.y);
     });
   }
   mountGrid(): void {
