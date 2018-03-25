@@ -23,7 +23,8 @@ export class MapComponent implements OnInit {
   missionType = "newMission";
   selectedProbe: MarsService.IProbe
   constructor(private http: HttpClient) {
-    let base = "http://localhost:54988";
+    // let base = "http://localhost:54988";
+    let base = "";
     this.service = new MarsService.Client(http, base);
   }
 
