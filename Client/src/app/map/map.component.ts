@@ -1,4 +1,4 @@
-import { Component, OnInit, Injectable } from '@angular/core';
+import { Component, OnInit, Injectable, NgProbeToken } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { MarsService } from './../services/MarsService'
@@ -18,9 +18,10 @@ export class MapComponent implements OnInit {
   gridObject: Grid = {};
   grid: Array<string>;
   explored = { 1: [2, 3, 5] };
-  probes = { "1": { "5": { direction: 90 } } };
+  probes = {};
   service: MarsService.Client;
   missionType = "newMission";
+  selectedProbe: MarsService.IProbe
   constructor(private http: HttpClient) {
     let base = "http://localhost:54988";
     this.service = new MarsService.Client(http, base);
@@ -31,13 +32,16 @@ export class MapComponent implements OnInit {
 
   }
   confirmGrid(x, y) {
-    let asd = new MarsService.Grid({ x: x, y: y });
-    let list = this.service.apiMarsPost(asd);
+    let grid = new MarsService.Grid({ x: x, y: y });
+    let list = this.service.apiMarsPost(grid);
 
     list.subscribe(world => {
       this.world = world;
       this.mountGrid();
     })
+  }
+  setProbe(id) {
+    this.selectedProbe = this.world.commandCenter.probes.map(q => { if (q.publicId == id) return q; })[0];
   }
   addProbe(x, y, direction) {
     var c = this.service.apiCommandCenterAddProbeByWorldIdPost(this.world.publicId, new MarsService.Position({ x, y, direction }));
@@ -47,8 +51,11 @@ export class MapComponent implements OnInit {
     })
 
   }
-  addCommand(probeId, command) {
-    let probe = this.world.commandCenter.probes.map(q => { if (q.publicId == probeId) return q; })[0];
+  getCommands() {
+    return this.selectedProbe.commands.map((q) => { return q == 0 ? 'L' : q == 1 ? 'M' : 'R' }).join('')
+  }
+  addCommand(command) {
+    let probe = this.selectedProbe
     if (probe.commands == null) { probe.commands = [command] } else {
       probe.commands.push(command);
     }
@@ -64,6 +71,21 @@ export class MapComponent implements OnInit {
       this.world = world
       this.mountGrid();
     });
+  }
+  playActions() {
+    var turns = this.world.commandCenter.probes.map((r) => { return r.commands.length }).reduce((a, b) => a + b, 0);
+
+    if (turns > 0) {
+      let list = this.service.apiCommandCenterMoveProbesPost(this.world.commandCenter).subscribe(q => {
+        this.world.commandCenter = q;
+        this.mountProbes();
+        setTimeout(() => {
+          this.playActions()
+        }, 1000);
+
+      });
+    }
+
   }
   setMission(type) {
     this.missionType = type ? 'newMission' : 'previousMission'
@@ -92,6 +114,17 @@ export class MapComponent implements OnInit {
     // -o-transform: rotate(${number}deg);
     // -ms-transform: rotate(${number}deg);`
   }
+  mountProbes() {
+    this.probes = {};
+    this.world.commandCenter.probes.forEach(probe => {
+      let direction = 90
+      if (probe.currentPosition.direction == 1) direction = 180;
+      if (probe.currentPosition.direction == 2) direction = -90;
+      if (probe.currentPosition.direction == 3) direction = 0;
+      this.probes[probe.currentPosition.x] = {}
+      this.probes[probe.currentPosition.x][probe.currentPosition.y] = { direction: direction }
+    });
+  }
   mountGrid(): void {
     this.setPhase(2);
     for (let x = 0; x < this.world.grid.x + 1; x++) {
@@ -102,5 +135,6 @@ export class MapComponent implements OnInit {
       }
     }
     this.grid = Object.keys(this.gridObject).reverse();
+    this.mountProbes();
   }
 }

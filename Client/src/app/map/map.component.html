@@ -34,14 +34,31 @@
       <b>Add Command</b>
     </p>
     <label> select the probe by coordination</label>
-    <select #selected>
+    <select #selected (change)="setProbe(selected.value)">
+      <option value="0">select a probe</option>
       <option *ngFor="let probe of world.commandCenter.probes" [value]="probe.publicId">({{probe.currentPosition.x}},{{probe.currentPosition.y}})</option>
     </select>
-    <button (click)="addCommand(selected.value,0)">Turn Left</button>
-    <button (click)="addCommand(selected.value,2)">Turn Right</button>
-    <button (click)="addCommand(selected.value,1)">Forward</button>
 
-    Commands:{{selected.value.commands}}
+    <span style="display: block;" *ngIf="selected.value!=0">
+      <button (click)="addCommand(0)">Turn Left</button>
+      <button (click)="addCommand(2)">Turn Right</button>
+      <button (click)="addCommand(1)">Forward</button>
+
+      <p>
+        Commands: {{getCommands()}}
+      </p>
+    </span>
+    <p>
+      <button (click)="saveWorld()">Save commands</button>
+    </p>
+    <hr />
+
+    <p>
+      <b>Play Actions</b>
+    </p>
+    <button (click)="playActions()"> play until end</button>
+
+
   </div>
   <div class="form" *ngIf="step==0">
     <div>

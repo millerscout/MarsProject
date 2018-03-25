@@ -19,9 +19,10 @@ namespace Core.Models
 		}
 		public bool MoveProbes(int turns = 1)
 		{
+
 			var probes = GetCurrentProbes();
 
-			var current = probes.FirstOrDefault(q => q.HasInstructions);
+			var current = probes.OrderBy(q => q.Order).FirstOrDefault(q => q.HasInstructions);
 
 			var command = current.GetNextCommand();
 
